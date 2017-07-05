@@ -42,7 +42,7 @@ body {
     border-left: 2px solid #f1f1f1;}
 .active-tab{background-color: silver;}
 .active-tab-text{margin-bottom: 30px;}
-.image-filters{margin-bottom: 15px;}
+.image-filters{margin-bottom: 5px;}
 #search-image{
     border: 1px solid silver;
     padding: 4px 10px;
@@ -153,3 +153,29 @@ table#image-meta tr td{padding: 0px 5px;}
 }
 a.si_chooseFiles:hover{text-decoration:none;}
 .si_closeUpload{display: none;}
+
+/*== SEARCH BOX ==*/
+.top-level-menu-right ul{
+    margin-bottom: 0px !important;
+    list-style-type: none;
+}
+.top-level-menu-right ul li{
+    display: inline-block;
+}
+.top-level-menu-right ul li input{
+    background-color: #c0c0c0;
+    border:none;
+    outline: none;
+    font-size: 12px;
+    font-weight: 200;
+    padding: 6px 10px 6px 10px;
+    border-radius: 3px;
+    width: 240px;
+}
+.search-btn{
+    position: absolute;
+    top: 4px;
+    right: 10px;
+    color: #fff;
+    text-decoration: none;
+}
