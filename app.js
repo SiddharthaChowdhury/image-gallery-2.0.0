@@ -15,7 +15,6 @@ app.use(fileUpload());
 app.use('/', routes);
 app.use(express.static(path.join(__dirname, 'assets')))
 
-
 server.listen(stage.port, function(){
 	console.log('\n'+'\x1b[33m%s\x1b[0m ', ' ENV: ', "\x1b[36m", stage.mode +"\n","\x1b[31m");
 	console.log( '\x1b[33m%s\x1b[0m: ', '\n Image-Gallery listening on port' ,"\x1b[36m", stage.port);

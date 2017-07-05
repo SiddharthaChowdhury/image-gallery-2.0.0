@@ -1,3 +1,5 @@
+var Datastore = require('nedb');
+var Images = new Datastore({ filename: './em-data/images.db', autoload: true }); 
 module.exports = function($){
 /* =====================================================================
 *						Routes comes here.		
@@ -29,11 +31,19 @@ module.exports = function($){
 
 		  // Use the mv() method to place the file somewhere on your server 
 		file.mv('./public/'+filename, function(err) {
-		    if (err)
-			    return res.status(500).send(err);
-		    res.send('File uploaded!');
+		    if (err)  return res.status(500).send(err);
+		    var imageData = {
+		    	title: filename,
+		    	dated: new Date()
+		    }
+		    Images.insert(imageData, function(err, doc) {  
+			    if(err) return res.status(500).send(err);
+			    return res.json({msg:"File is uploaded!", data: doc})
+			});
+		    // res.send('File uploaded!');
 		});
-	})
+	});
+
 
 // =====================================================================
 return $;}
