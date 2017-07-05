@@ -31,8 +31,7 @@ lib-cov
 *.out
 *.pid
 npm-debug.log
-
-
+*.db
 
 
 
