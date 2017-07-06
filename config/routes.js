@@ -19,28 +19,41 @@ module.exports = function($){
 	})	
 
 	$.post('/upload-image',function(req, res){
-		// console.log(req.files);
-		if (!req.files)
-		    return res.status(400).send('No files were uploaded. (Response from server)');
+		if (!req.files){
+		    res.status(400)
+		    return res.json({mag: 'No files were uploaded.'});
+		}
+		var raw = req.body;
 		let file = req.files.incoming;
 		let filename = Date.now() 
 
 		var extension = file.name.split('.').pop();
 	    filename = filename+'.'+extension;
-
-
+	    
+	    var tags = null;
+	    if( raw.tags ){
+	    	tags = raw["tags"].split(",");
+		    for(var i = 0; i < tags.length; i++){
+		    	tags[i] = tags[i].trim();
+		    }
+	    } 
+		    
 		  // Use the mv() method to place the file somewhere on your server 
 		file.mv('./public/'+filename, function(err) {
 		    if (err)  return res.status(500).send(err);
 		    var imageData = {
-		    	title: filename,
-		    	dated: new Date()
+		    	filename,
+		    	filetype: "image",
+		    	extension,
+		    	title: raw["image-name"],
+		    	alt: raw["alt-text"] || null,
+		    	tags,
+		    	dated: new Date().toLocaleString()
 		    }
 		    Images.insert(imageData, function(err, doc) {  
 			    if(err) return res.status(500).send(err);
 			    return res.json({msg:"File is uploaded!", data: doc})
 			});
-		    // res.send('File uploaded!');
 		});
 	});
 

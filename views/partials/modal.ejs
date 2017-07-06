@@ -1,47 +1,49 @@
 <!-- Modal -->
     <div class="modal fade" id="myModal" role="dialog">
         <div class="modal-dialog modal-lg">
-        
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Set image before upload.</h4>
-                    <small><b>Please note!</b>  You can edit this image from the library, after the upload is complete.</small>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-7" id="prev-container">
-                            <!-- <img src="" class="col-md-12" id="preview-on-trigger"> -->
-                        </div>
-                        <div class="col-md-5">
-                            <table class="table" style="border-top:none;">
-                                <tr>
-                                    <td>Title</td>
-                                    <td><input type="text" name="" class="form-control"></td>
-                                </tr>
-                                <tr>
-                                    <td>Caption</td>
-                                    <td><input type="text" name="" class="form-control"></td>
-                                </tr>
-                                <tr>
-                                    <td>Tags</td>
-                                    <td><input type="text" name="" class="form-control"></td>
-                                </tr>
-                                <tr>
-                                    <td>Description</td>
-                                    <td><textarea rows="3" class="form-control"></textarea></td>
-                                </tr>
-                            </table>
+            <form method="post" action="/upload-image" id="image-upload-form">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Set image before upload.</h4>
+                        <small><b>Please note!</b>  You can edit this image from the library, after the upload is complete.</small>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-7" id="prev-container">
+                                <!-- <img src="" class="col-md-12" id="preview-on-trigger"> -->
+                            </div>
+                            <div class="col-md-5">
+                                <div class="si_mike"></div>
+                                <table class="table" style="border-top:none;">
+                                    <tr>
+                                        <td>Title <font color="red">*</font></td>
+                                        <td><input type="text" name="image_name" class="form-control" placeholder="Image name"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Alt text</td>
+                                        <td><input type="text" name="image_caption" class="form-control" placeholder="Alternate text"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Tags</td>
+                                        <td><input type="text" name="tags" class="form-control" placeholder="Keywords"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Description</td>
+                                        <td><textarea rows="3" class="form-control" name="description" placeholder="This image is about?"></textarea></td>
+                                    </tr>
+                                </table>
+                            </div>
                         </div>
                     </div>
+                    <input type="file" name="incoming" id="file-select" style="display:none;">
+                    <div class="modal-footer">
+                        <small class="pull-left"><span class="prev_size"></span> kb &nbsp; (<span class="prev_diamention"></span>)</small>
+                        <button type="submit" id="submit-image" class="btn btn-default">Save image</button>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <small class="pull-left"><span class="prev_size"></span> kb &nbsp; (<span class="prev_diamention"></span>)</small>
-                    <button type="button" class="btn btn-default">Save image</button>
-                </div>
-            </div>
-          
+            </form>
         </div>
     </div>
-    <input type="file" name="file-select" id="file-select" style="display:none;">
+    

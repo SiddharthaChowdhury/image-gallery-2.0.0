@@ -134,6 +134,11 @@ table#image-meta tr td{padding: 0px 5px;}
 }
 
 
+#submit-image{
+  background-color: #088A4B;
+  color: #fff;
+  border: none;
+}
 /*
   Incoming_upload.js
 */
