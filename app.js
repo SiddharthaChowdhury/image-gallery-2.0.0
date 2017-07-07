@@ -13,7 +13,8 @@ app.set('x-powered-by', 'Austin4Silvers');
 
 app.use(fileUpload());
 app.use('/', routes);
-app.use(express.static(path.join(__dirname, 'assets')))
+app.use(express.static(path.join(__dirname, 'assets')));
+app.use('/image', express.static(path.join(__dirname, 'public')));
 
 server.listen(stage.port, function(){
 	console.log('\n'+'\x1b[33m%s\x1b[0m ', ' ENV: ', "\x1b[36m", stage.mode +"\n","\x1b[31m");

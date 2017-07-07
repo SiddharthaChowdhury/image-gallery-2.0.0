@@ -38,7 +38,7 @@ module.exports = function($){
 		    }
 	    } 
 		    
-		  // Use the mv() method to place the file somewhere on your server 
+		// Use the mv() method to place the file somewhere on your server 
 		file.mv('./public/'+filename, function(err) {
 		    if (err)  return res.status(500).send(err);
 		    var imageData = {
@@ -48,7 +48,8 @@ module.exports = function($){
 		    	title: raw["image-name"],
 		    	alt: raw["alt-text"] || null,
 		    	tags,
-		    	dated: new Date().toLocaleString()
+		    	dated: new Date().toLocaleString(),
+		    	link: "/image/"+filename
 		    }
 		    Images.insert(imageData, function(err, doc) {  
 			    if(err) return res.status(500).send(err);
