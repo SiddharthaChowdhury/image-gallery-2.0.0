@@ -12,6 +12,7 @@
     "ejs": "^2.5.5",
     "express": "^4.14.0",
     "express-fileupload": "^0.1.4",
+    "image-size": "^0.6.0",
     "install": "^0.10.1",
     "nedb": "^1.8.0",
     "npm": "^5.0.4",

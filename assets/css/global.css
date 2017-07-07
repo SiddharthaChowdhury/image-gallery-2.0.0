@@ -16,6 +16,9 @@ body {
   font-family: Sans-Serif;
 }
 /* Bootstrap override */
+.tooltip{
+    z-index: 9999 !important;
+}
 .btn{
 	border-radius: 1px;
 }
@@ -184,3 +187,4 @@ a.si_chooseFiles:hover{text-decoration:none;}
     color: #fff;
     text-decoration: none;
 }
+

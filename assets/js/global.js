@@ -1,37 +1,20 @@
 $(document).ready(function(){
 	// tooltip
-	// if($('#upload-section').length != 0){
-	// 	$('[data-tooltip="true"]').tooltip(); 
-	//     var x = new $Incoming({
-	// 		dropAreaID : "#upload-section", // this element should have fixed height,
-	// 		uploadURL : "/upload-image",
-	// 		method: "POST", // 'GET' or 'POST'
-	// 		handlerName: "incoming",
-	// 		uploadSuccess: function(data){
-	// 			console.log(data)
-	// 		}
-	// 	});
-	// }
+	$('[data-toggle="tooltip"]').tooltip();
+
 	$('.trigger-file-upload').click(function(e){
 		e.preventDefault();
 		$("#file-select").click();
 	})
 
-	// function readURL(input) {
- //        if (input.files && input.files[0]) {
- //            var reader = new FileReader();
- //            var file = input.files[0];
- //            var sizeKB = file.size / 1024;
- //            reader.onload = function (e) {
- //                $('#preview-on-trigger').attr('src', e.target.result);
- //                // $('#myModal').show()
- //                alert("Size: " + sizeKB + "KB\nWidth: " + reader.width + "\nHeight: " + reader.height);
- //                $('#myModal').modal('show');
- //            }
-            
- //            reader.readAsDataURL(input.files[0]);
- //        }
- //    }
+    // Disable form submit on ENTER pressed
+    $(window).keydown(function(event){
+        if(event.keyCode == 13) {
+            event.preventDefault();
+            return false;
+        }
+    });
+
 	var _URL = window.URL || window.webkitURL;
     function readURL(input) {
         if (input.files && input.files[0]) {
@@ -51,7 +34,7 @@ $(document).ready(function(){
             img.src = _URL.createObjectURL(file);
         }
     }
-    
+
     // When input file is selected
     var __FILE;
     $("#file-select").change(function(e){
@@ -70,6 +53,7 @@ $(document).ready(function(){
             mike.html('<font color="red"><b>Error! </b> Image TITLE is mandetory. </font>')
         }else{
             if(file.type.match('image')){
+                mike.html('<font><b>Please wait ... </b></font>')
                 var formdata = new FormData();
                 formdata.append("incoming", file);
                 formdata.append("image-name", _self.find('input[name="image_name"]').val())
@@ -84,24 +68,65 @@ $(document).ready(function(){
                     dataType: 'json',
                     processData: false, // Don't process the files
                     contentType: false, // Set content type to false as jQuery will tell the server its a query string request
-                    success: function(data, textStatus, jqXHR)
-                    {
-                        mike.html('<font color="green"><b>Success! </b>Image saved successfully.</font>')
-                        setTimeout(function(){ location.reload(); }, 1500);
-                        
+                    success: function(data, textStatus, jqXHR){
+                        setTimeout(function(){ 
+                            mike.html('<font color="green"><b>Success! </b>Image saved successfully.</font>')
+                            location.reload(); 
+                        }, 1500);
                     },
-                    error: function(jqXHR, textStatus, errorThrown)
-                    {
-                        // Handle errors here
+                    error: function(jqXHR, textStatus, errorThrown){
                         mike.html('<font color="red"><b>Error! </b>Upload failed.</font>')
                         location.reload();
-                        // STOP LOADING SPINNER
                     }
                 });
             }else{
                 mike.html('<font color="red"><b>Error! </b> File is not an image. </font>')
             }
         }
+    })
+
+
+    // Thumbnail click from gallery
+    $('.jq_thumbnail').click(function(e){
+        e.preventDefault();
+
+        if( $('#chosen-id').val().trim() != $(this).attr('data-id').trim() ){
+            var formdata = new FormData();
+            formdata.append("id", $(this).attr('data-id'));
+            $.ajax({
+                url: '/get-image',
+                type: 'POST',
+                data: formdata,
+                cache: false,
+                dataType: 'json',
+                processData: false, // Don't process the files
+                contentType: false, // Set content type to false as jQuery will tell the server its a query string request
+                success: function(data, textStatus, jqXHR){
+                    // textStatus = success
+                    var img = data.img
+                    $('.chosen-name').text(img.filename);
+                    $('.chosen-size').text(img.size);
+                    $('.chosen-diam').text(img.width+" x "+img.height);
+                    $('.chosen-date').text(img.dated);
+                    $('.chosen-image').attr("src", $("#host").val()+img.link);
+                    $('.chosen-image').attr("title", img.title);
+                    $('.chosen-image').attr("alt", img.alt);
+                    // console.log()
+                    // $('.bootstrap-tagsinput').find('input').val("")
+                    // $('.bootstrap-tagsinput').find('input').val(img.tags != null ? img.tags.join(",") : "")
+                    $('#chosen-tags').val(img.tags != null ? img.tags.join(",") : "");
+                    $('#chosen-title').val(img.title);
+                    $('#chosen-alt').val(img.alt);
+                    $('#chosen-desc').text(img.desc);
+                    $('#chosen-id').val(img._id);
+                },
+                error: function(jqXHR, textStatus, errorThrown){
+                    // textStatus = error
+                    console.log(errorThrown)
+                }
+            });
+        }
+            
     })
 
 });

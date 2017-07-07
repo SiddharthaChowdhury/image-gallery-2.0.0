@@ -3,6 +3,7 @@
 				<% if(section == "library") {%>
 				<div>All Images</div>
 				<div class="row">
+					<% if( imgs.length > 0 ) {%>
 					<div class="col-md-8 image-thumb-cont">
 						<div class="col-md-12 image-filters">
 							<select class="pull-left image-thumb-sort">
@@ -23,73 +24,68 @@
 								</ul>
 							</label>
 						</div>
+						<%}%>
 						<div class="col-md-12 thumbnail-panel">
-							
+							<% if( imgs.length > 0 ) {%>
 							<!-- thumbnails -->
 							<section id="photos">
-								<img src="<%= host %>/images/1.jpg" class="img-thumbnail" alt="Cinque Terre" >
-								<img src="<%= host %>/images/3.jpg" class="img-thumbnail" alt="Cinque Terre" >
-								<img src="<%= host %>/images/4.jpg" class="img-thumbnail" alt="Cinque Terre" >
-								<img src="<%= host %>/images/3.jpg" class="img-thumbnail" alt="Cinque Terre" >
-								<img src="<%= host %>/images/2.jpg" class="img-thumbnail" alt="Cinque Terre" >
-								<img src="<%= host %>/images/5.jpg" class="img-thumbnail" alt="Cinque Terre" >
-								<img src="<%= host %>/images/8.jpg" class="img-thumbnail" alt="Cinque Terre" >
-								<img src="<%= host %>/images/7.jpg" class="img-thumbnail" alt="Cinque Terre" >
-								<img src="<%= host %>/images/6.jpg" class="img-thumbnail" alt="Cinque Terre" >
-								<img src="<%= host %>/images/4.jpg" class="img-thumbnail" alt="Cinque Terre" >
-								<img src="<%= host %>/images/1.jpg" class="img-thumbnail" alt="Cinque Terre" >
-								<img src="<%= host %>/images/6.jpg" class="img-thumbnail" alt="Cinque Terre" >
-								<img src="<%= host %>/images/3.jpg" class="img-thumbnail" alt="Cinque Terre" >
-								<img src="<%= host %>/images/2.jpg" class="img-thumbnail" alt="Cinque Terre" >
-								<img src="<%= host %>/images/8.jpg" class="img-thumbnail" alt="Cinque Terre" >
-								<img src="<%= host %>/images/7.jpg" class="img-thumbnail" alt="Cinque Terre" >
-								<img src="<%= host %>/images/6.jpg" class="img-thumbnail" alt="Cinque Terre" >
-								<img src="<%= host %>/images/2.jpg" class="img-thumbnail" alt="Cinque Terre" >
-								<img src="<%= host %>/images/1.jpg" class="img-thumbnail" alt="Cinque Terre" >
-								<img src="<%= host %>/images/3.jpg" class="img-thumbnail" alt="Cinque Terre" >
+								<% for(var i in imgs){ %>
+								<img src="<%= host+imgs[i].link %>" class="img-thumbnail jq_thumbnail" data-id="<%= imgs[i]._id %>" title="<%= imgs[i].title %>" alt="<%= imgs[i].alt %>" >
+								<% } %>
 							</section>
+							<%} else {%>
+								<div class="col-md-12 text-center">
+									<h3>There are no images to display! </h3>
+									Please <a href="#" class="trigger-file-upload" >upload image</a>.
+								</div>
+							<%}%>
 						</div>
 					</div>
 					<div class="col-md-4">
 						<!-- Right -->
+						<% if( imgs.length > 0 ) {%>
 						<div class="edit-prev-del">
 							<a href="#" class="preview">Preview</a> &nbsp; 
 							<a href="#" class="preview">Edit</a> &nbsp; 
 							<a href="#" class="preview">Delete</a>
 						</div>
-						<label><img src="https://www.howtogeek.com/wp-content/uploads/2010/03/ruralscenes15.jpg" alt="Cinque Terre" class="chosen-image" ></label>
+						<label><img src="<%= host+imgs[0].link %>" alt="<%= host+imgs[0].alt %>" class="chosen-image" title="<%= imgs[0].title %>"></label>
 						<div class="chosen-meta">
 							<small>
+								<input type="hidden" id="chosen-id" value="<%= imgs[0]._id %>">
 								<table id="image-meta">
-									<tr><td>Name: </td><td><b>one-fkin image.jpg</b></td></tr>
-									<tr><td>Size: </td><td>1022kb</td></tr>
-									<tr><td>Diamention: </td><td>759 x 345</td></tr>
-									<tr><td>Date: </td><td>5 January 2017</td></tr>
+									<tr><td>Name: </td><td><b class="chosen-name"><%= imgs[0].filename %></b></td></tr>
+									<tr><td>Size: </td><td class="chosen-size"><%= imgs[0].size %>mb</td></tr>
+									<tr><td>Diamention: </td><td class="chosen-diam"><%= imgs[0].width %> x <%= imgs[0].height %></td></tr>
+									<tr><td>Date: </td><td class="chosen-date"><%= imgs[0].dated %></td></tr>
 								</table>		
 							</small>
 							<hr>
 							<div class="image-meta-edit">
 								<div class="form-group">
-								  	<label for="usr">URL:</label>
-								  	<input type="text" class="form-control" id="usr">
+								  	<label for="usr">Tags:</label>
+								  	<!-- <input type="text" class="form-control" data-role="tagsinput" id="chosen-tags" value="<%= imgs[0].tags != null ? imgs[0].tags.join(',') : '' %>"> -->
+								  	<input type="text" class="form-control" id="chosen-tags" value="<%= imgs[0].tags != null ? imgs[0].tags.join(',') : '' %>">					
+								</div>
+								<hr>
+								<div class="form-group">
+								  	<label for="usr">Title:</label>
+								  	<input type="text" class="form-control" id="chosen-title" value="<%= imgs[0].title %>">
 								</div>
 								<div class="form-group">
-								  	<label for="usr">title:</label>
-								  	<input type="text" class="form-control" id="usr">
-								</div>
-								<div class="form-group">
-								  	<label for="usr">alt text:</label>
-								  	<input type="text" class="form-control" id="usr">
+								  	<label for="usr">Alt text:</label>
+								  	<input type="text" class="form-control" id="chosen-alt" value="<%= imgs[0].alt %>">
 								</div>
 								<div class="form-group">
 								  	<label for="comment">Description:</label>
-								  	<textarea class="form-control" rows="3" id="comment"></textarea>
+								  	<textarea class="form-control" rows="3" id="chosen-desc"><%= imgs[0].desc %></textarea>
 								</div>
 								<div class="text-right">
 									<button class="btn btn-primary"> Save changes </button>
 								</div>
 							</div>
 						</div>
+						<%}%>
 					</div>
 				</div>
 				<%}%>

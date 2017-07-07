@@ -11,13 +11,18 @@ module.exports = function($){
 */
 
 	$.get('/', function(req, res){
-		res.render("index", {host: req.protocol+'://'+req.get('host'), section: "library"});
+      	Images.find({}).sort({ dated: 1 }).skip(0).limit(20).exec(function (err, imgs) {
+		  	if(err) return res.send("Error! Request failed due to to some unknown error.")
+			res.render("index", {host: req.protocol+'://'+req.get('host'), section: "library", imgs});
+		});
+		
 	})
 
 	$.get('/upload', function(req, res){
 		res.render("index", {host: req.protocol+'://'+req.get('host'), section: "upload"});
 	})	
 
+	// Upload image
 	$.post('/upload-image',function(req, res){
 		if (!req.files){
 		    res.status(400)
@@ -25,7 +30,9 @@ module.exports = function($){
 		}
 		var raw = req.body;
 		let file = req.files.incoming;
-		let filename = Date.now() 
+		let filename = Date.now();
+		let sizeOf = require('image-size');
+		let fs = require("fs");
 
 		var extension = file.name.split('.').pop();
 	    filename = filename+'.'+extension;
@@ -48,15 +55,49 @@ module.exports = function($){
 		    	title: raw["image-name"],
 		    	alt: raw["alt-text"] || null,
 		    	tags,
+		    	desc: raw.description || null,
 		    	dated: new Date().toLocaleString(),
-		    	link: "/image/"+filename
+		    	link: "/image/"+filename,
+		    	width: null,
+		    	height: null,
+		    	size: null
 		    }
 		    Images.insert(imageData, function(err, doc) {  
 			    if(err) return res.status(500).send(err);
-			    return res.json({msg:"File is uploaded!", data: doc})
+			    else{
+			    	let dimensions = sizeOf('./public/'+filename);
+					const stats = fs.statSync('./public/'+filename);
+					const fileSizeInBytes = stats.size;
+					const fileSizeInMegabytes = fileSizeInBytes / 1000000.0;
+
+					var updt = { 
+						width: dimensions.width,
+				    	height: dimensions.height,
+				    	size: fileSizeInMegabytes
+					};
+					Images.update({_id: doc._id}, { $set: updt }, { }, function (err, update) {
+						if(err) return res.status(500).send(err);
+						return res.json({msg:"File is uploaded!", data: doc})
+					});
+			    }
 			});
 		});
 	});
+
+	// GET image details
+	$.post('/get-image', function(req, res){
+		var raw = req.body;
+		if(!raw.id){
+			res.status(400);
+			return res.json({msg: "Error! image identification was not found!"})
+		}else{
+			Images.findOne({_id: raw.id}, function(err, img){
+				if(err) return res.status(400).send(err);
+				res.status(200);
+				return res.json({msg:"Request was successful!", img});
+			});
+		}
+	})
 
 
 // =====================================================================
