@@ -165,15 +165,21 @@ $(document).ready(function(){
         }
     });
 
-    $('.reset-cropper').click(function(e){
-        e.preventDefault();
-        cropper.reset(); // Flip vertical
-    });
 
-    $('._clearCropping').click(function(e){
-        e.preventDefault();
-        cropper.clear();
-    });
+    $('._undoCrop').click(function(e){
+        e.preventDefault()
+        if(lastImgSrc.length > 0){
+            var image = new Image()
+            image.style = "width:100%;"
+            image.onload = function() {
+                cropper = new Cropper(this, {
+                });
+            }
+            image.src = lastImgSrc.pop()
+            $('#cropCanvas').html(image)
+        }
+    })
+
     $('.drag-image').click(function(e){
         e.preventDefault();
         cropper.setDragMode("move")
@@ -201,15 +207,24 @@ $(document).ready(function(){
             });
         }
         image.src = $('.chosen-image').attr("src");
+        lastImgSrc = [];
         $('#cropCanvas').html(image)
     })
 
     $('._croppedImage').click(function(e){
         e.preventDefault();
-        lastImgSrc = $('.cropper-hidden').attr("src")
-        var canv = cropper.getCroppedCanvas({width: 500});
-        $('#croppedCanvas').find('.croppedCanvasContainer').html(canv)
-        $('#croppedCanvas').modal('show');
+        lastImgSrc.push( $('.cropper-hidden').attr("src") )
+        // var canv = cropper.getCroppedCanvas({width: 500});
+        // $('#croppedCanvas').find('.croppedCanvasContainer').html(canv)
+        // $('#croppedCanvas').modal('show');
+        var image = new Image()
+        image.style = "width:100%;"
+        image.onload = function() {
+            cropper = new Cropper(this, {
+            });
+        }
+        image.src = cropper.getCroppedCanvas().toDataURL()
+        $('#cropCanvas').html(image)
         
     })
 });

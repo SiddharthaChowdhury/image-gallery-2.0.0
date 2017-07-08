@@ -252,3 +252,8 @@ table#image-meta tr td{padding: 0px 5px;}
     color:#fff;
     text-decoration: none;
 }
+#cropCanvas{
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
