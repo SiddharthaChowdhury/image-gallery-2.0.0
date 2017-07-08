@@ -1,5 +1,5 @@
-<!-- Modal -->
-    <div class="modal fade" id="myModal" role="dialog">
+    <!-- Modal -->
+    <div class="modal fade" id="uploadModal" role="dialog">
         <div class="modal-dialog modal-lg">
             <form method="post" action="/upload-image" id="image-upload-form">
                 <!-- Modal content-->
@@ -46,4 +46,70 @@
             </form>
         </div>
     </div>
-    
+
+    <!-- Cropper-modal -->
+    <div id="open_si_Modal" class="si_modal">
+        <div class="si_modalWrapper ">
+            <div class="row si_modal_top">
+                <h4>Edit image</h4>
+                <a href="#" class="si_modalClose"> &#10006;</a>
+            </div>
+            <div class="row si_modal_body">
+                <div class="col-md-12" id="cropCanvas">
+                    <!-- <img src="" style="max-width: 100%;" id="editable-image"> -->
+                </div>
+            </div>
+            <div class="row si_modal_foot">
+                <ul class="crop-tool">
+                    <li>
+                        <a href="#" class="zoom-in"><i class="fa fa-search-plus" aria-hidden="true"></i></i></a>
+                        <a href="#" class="zoom-out"><i class="fa fa-search-minus" aria-hidden="true"></i></i></a>
+                    </li>
+                    <li>
+                        <a href="#" class="start-crop"><i class="fa fa-crop" aria-hidden="true"></i></a>
+                        <a href="#" class="drag-image"><i class="fa fa-arrows" aria-hidden="true"></i></i></a>
+                    </li>
+                    <li>
+                        <a href="#" class="rotate-right"><i class="fa fa-repeat" aria-hidden="true"></i></a>
+                        <a href="#" class="rotate-left"><i class="fa fa-undo" aria-hidden="true"></i></a>
+                    </li>
+                    <li>
+                        <a href="#" class="flip-h"><i class="fa fa-arrows-h" aria-hidden="true"></i></a>
+                        <a href="#" class="flip-v"><i class="fa fa-arrows-v" aria-hidden="true"></i></a>
+                    </li>
+                </ul>
+                <ul class="crop-tool2">
+                    <li><a href="#" class="_16by9">16:9</a></li>
+                    <li><a href="#" class="_4by3">4:3</a></li>
+                    <li><a href="#" class="reset-cropper"><i class="fa fa-refresh" aria-hidden="true"></i> Reset edit</a></li>
+                    <li><a href="#" class="_clearCropping"><i class="fa fa-times" aria-hidden="true"></i> Clear </a></li>
+                    <li><a href="#" class="_croppedImage"><i class="fa fa-crop" aria-hidden="true"></i> Crop image</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cropped image -->
+    <div class="modal fade" id="croppedCanvas" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <!-- <form method="post" action="/upload-image" id="image-upload-form"> -->
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Set image before upload.</h4>
+                        <small><b>Please note!</b>  You can edit this image from the library, after the upload is complete.</small>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row croppedCanvasContainer text-center">
+                            
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="#" class="btn btn-primary" data-dismiss="modal">Discard</a>
+                        <button type="button" id="submit-image" class="btn btn-default">Save image</button>
+                    </div>
+                </div>
+            <!-- </form> -->
+        </div>
+    </div>

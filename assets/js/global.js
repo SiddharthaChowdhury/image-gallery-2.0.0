@@ -29,7 +29,7 @@ $(document).ready(function(){
                 $('.prev_size').text(Math.round(sizeKB * 100) / 100);
                 $('.prev_diamention').text(img.height +" x "+ img.width);
                 $('input[name="image_name"]').val(file.name)
-                $('#myModal').modal('show');
+                $('#uploadModal').modal('show');
             }
             img.src = _URL.createObjectURL(file);
         }
@@ -126,7 +126,90 @@ $(document).ready(function(){
                 }
             });
         }
-            
     })
 
+
+    // Editable image
+    var image = document.getElementById('editable-image');
+    var flips = { h: 1, v: 1 };
+    var lastImgSrc = "";
+    var cropper;
+    $('.rotate-right').click(function(e){
+        e.preventDefault();
+        cropper.rotate(45);
+    })
+    $('.rotate-left').click(function(e){
+        e.preventDefault();
+        cropper.rotate(-45);
+    })
+    $('.flip-h').click(function(e){
+        e.preventDefault();
+        if(flips.h == 1){
+            flips.h = 0;
+            cropper.scale(-1, 1); // Flip horizontal
+        }
+        else{
+            flips.h = 1;
+            cropper.scale(1, 1); // Flip horizontal
+        }
+    });
+    $('.flip-v').click(function(e){
+        e.preventDefault();
+        if(flips.v == 1){
+            flips.v = 0;
+            cropper.scale(1, -1); // Flip vertical
+        }
+        else{
+            flips.v = 1;
+            cropper.scale(1, 1); // Flip vertical
+        }
+    });
+
+    $('.reset-cropper').click(function(e){
+        e.preventDefault();
+        cropper.reset(); // Flip vertical
+    });
+
+    $('._clearCropping').click(function(e){
+        e.preventDefault();
+        cropper.clear();
+    });
+    $('.drag-image').click(function(e){
+        e.preventDefault();
+        cropper.setDragMode("move")
+    });
+    $('.start-crop').click(function(e){
+        e.preventDefault();
+        cropper.setDragMode("crop")
+    });
+
+    $('.zoom-in').click(function(e){
+        e.preventDefault();
+        cropper.zoom(0.1)
+    });
+    $('.zoom-out').click(function(e){
+        e.preventDefault();
+        cropper.zoom(-0.1)
+    });
+
+    $('.edit-chosen').click(function(e){
+        var image = new Image()
+        image.style = "width:100%;"
+        // $(image).attr("src", $('.chosen-image').attr("src"));
+        image.onload = function() {
+            cropper = new Cropper(this, {
+            });
+        }
+        image.src = $('.chosen-image').attr("src");
+        $('#cropCanvas').html(image)
+    })
+
+    $('._croppedImage').click(function(e){
+        e.preventDefault();
+        lastImgSrc = $('.cropper-hidden').attr("src")
+        var canv = cropper.getCroppedCanvas({width: 500});
+        $('#croppedCanvas').find('.croppedCanvasContainer').html(canv)
+        $('#croppedCanvas').modal('show');
+        
+    })
 });
