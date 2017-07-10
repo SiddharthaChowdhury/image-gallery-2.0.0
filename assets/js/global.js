@@ -85,11 +85,10 @@ $(document).ready(function(){
         }
     })
 
-
     // Thumbnail click from gallery
     $('.jq_thumbnail').click(function(e){
         e.preventDefault();
-
+        $('.image-meta-edit').hide();
         if( $('#chosen-id').val().trim() != $(this).attr('data-id').trim() ){
             var formdata = new FormData();
             formdata.append("id", $(this).attr('data-id'));
@@ -104,6 +103,7 @@ $(document).ready(function(){
                 success: function(data, textStatus, jqXHR){
                     // textStatus = success
                     var img = data.img
+                    $('.chosen-title').text(img.title);
                     $('.chosen-name').text(img.filename);
                     $('.chosen-size').text(img.size);
                     $('.chosen-diam').text(img.width+" x "+img.height);
@@ -119,6 +119,8 @@ $(document).ready(function(){
                     $('#chosen-alt').val(img.alt);
                     $('#chosen-desc').text(img.desc);
                     $('#chosen-id').val(img._id);
+                    $('#chosen-file').val(img.filename);
+
                 },
                 error: function(jqXHR, textStatus, errorThrown){
                     // textStatus = error
@@ -128,20 +130,19 @@ $(document).ready(function(){
         }
     })
 
-
     // Editable image
     var image = document.getElementById('editable-image');
     var flips = { h: 1, v: 1 };
-    var lastImgSrc = "";
+    var lastImgSrc = [];
     var cropper;
     $('.rotate-right').click(function(e){
         e.preventDefault();
         cropper.rotate(45);
-    })
+    });
     $('.rotate-left').click(function(e){
         e.preventDefault();
         cropper.rotate(-45);
-    })
+    });
     $('.flip-h').click(function(e){
         e.preventDefault();
         if(flips.h == 1){
@@ -165,7 +166,6 @@ $(document).ready(function(){
         }
     });
 
-
     $('._undoCrop').click(function(e){
         e.preventDefault()
         if(lastImgSrc.length > 0){
@@ -178,7 +178,7 @@ $(document).ready(function(){
             image.src = lastImgSrc.pop()
             $('#cropCanvas').html(image)
         }
-    })
+    });
 
     $('.drag-image').click(function(e){
         e.preventDefault();
@@ -215,7 +215,8 @@ $(document).ready(function(){
             lastImgSrc = [];
             $('#cropCanvas').html(image)
         })
-    })
+        $('.image-meta-edit').show();
+    });
 
     $('._croppedImage').click(function(e){
         e.preventDefault();
@@ -231,6 +232,44 @@ $(document).ready(function(){
         }
         image.src = cropper.getCroppedCanvas().toDataURL()
         $('#cropCanvas').html(image)
+    });
+
+    $('.jq_updateImgMeta').click(function(e){
+        if(lastImgSrc.length > 0){
+            // Update with cropped image
+            cropper.getCroppedCanvas().toBlob(function (blob) {
+                var formData = new FormData();
+
+                formData.append('incoming', blob);
+                formData.append('fileName', $('#chosen-file').val())
+                formData.append('_id',$('#chosen-id').val())
+                formData.append('title',$('#chosen-title').val())
+                formData.append('tags',$('#chosen-tags').val())
+                formData.append('alt',$('#chosen-alt').val())
+                formData.append('desc',$('#chosen-desc').val() || $('#chosen-desc').text())
+
+                // Use `jQuery.ajax` method
+                $.ajax('/update-image', {
+                    method: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function () {
+                        console.log('Upload success');
+                    },
+                    error: function () {
+                        console.log('Upload error');
+                    }
+                });
+            });
+        }else{
+            // Update only details
+            formData.append('_id',$('#chosen-id').val())
+            formData.append('title',$('#chosen-title').val())
+            formData.append('tags',$('#chosen-tags').val())
+            formData.append('alt',$('#chosen-alt').val())
+            formData.append('desc',$('#chosen-desc').val() || $('#chosen-desc').text())
+        }
         
-    })
+    });
 });

@@ -99,6 +99,85 @@ module.exports = function($){
 		}
 	})
 
+	// Update Image
+	$.post('/update-image', function(req, res){
+		// if (!req.files){
+		//     res.status(400)
+		//     return res.json({mag: 'No files were uploaded.'});
+		// }
+		var raw = req.body;
+		if(!raw._id){
+			res.status(400);
+			return res.json({msg:"Update failed. (No identity) "})
+		}
+		if (req.files){
+			let file = req.files.incoming;
+			let filename;
+			let sizeOf = require('image-size');
+			let fs = require("fs");
+
+			var extension = file.name.split('.').pop();
+		    // filename = filename+'.'+extension;
+		    
+		    var tags = null;
+		    if( raw.tags ){
+		    	tags = raw["tags"].split(",");
+			    for(var i = 0; i < tags.length; i++){
+			    	tags[i] = tags[i].trim();
+			    }
+		    }
+		    Images.findOne({_id: raw._id}, function(err, img){
+		    	if(err || !img) {
+		    		res.status(400)
+		    		return res.send(err || "Error! Identity failed.")
+		    	}
+		    	var filename = img.filename;
+		    	fs.unlink('./public/'+filename, function(err){
+		    		if(err) {
+		    			res.status(400);
+		    			return res.send("Error! Image update failed. (replace of image failed)")
+		    		}
+		    		// Use the mv() method to place the file somewhere on your server 
+					file.mv('./public/'+filename, function(err) {
+					    if (err)  return res.status(500).send(err);
+					    var imageData = {
+					    	filename,
+					    	filetype: "image",
+					    	extension,
+					    	title: raw["title"],
+					    	alt: raw["alt"] || null,
+					    	tags,
+					    	desc: raw["desc"] || null,
+					    	dated: new Date().toLocaleString(),
+					    	link: "/image/"+filename,
+					    	width: null,
+					    	height: null,
+					    	size: null
+					    }
+					    Images.update({_id: raw["_id"]}, imageData, function(err, doc) {  
+						    if(err) return res.status(500).send(err);
+						    else{
+						    	let dimensions = sizeOf('./public/'+filename);
+								const stats = fs.statSync('./public/'+filename);
+								const fileSizeInBytes = stats.size;
+								const fileSizeInMegabytes = fileSizeInBytes / 1000000.0;
+
+								var updt = { 
+									width: dimensions.width,
+							    	height: dimensions.height,
+							    	size: fileSizeInMegabytes
+								};
+								Images.update({_id: raw._id}, { $set: updt }, { }, function (err, update) {
+									if(err) return res.status(500).send(err);
+									return res.json({msg:"File is updated!", data: doc})
+								});
+						    }
+						});
+					});
+				})  
+		    }) 
+		}
+	})
 
 // =====================================================================
 return $;}

@@ -80,6 +80,7 @@ table#image-meta tr td{padding: 0px 5px;}
 }
 .image-meta-edit{
     margin: 12px;
+    display: none;
 }
 .form-control{border-radius: 1px !important;}
 
@@ -181,6 +182,7 @@ table#image-meta tr td{padding: 0px 5px;}
     border-radius: 3px;
     padding: 8px 0px;
     padding-right: 10px;
+    margin-top: 10px;
 }
 .si_modalWrapper ul.crop-tool li a { 
     text-decoration: none; 
