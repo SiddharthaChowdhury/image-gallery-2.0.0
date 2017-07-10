@@ -11,12 +11,25 @@ module.exports = function($){
 */
 
 	$.get('/', function(req, res){
+      	Images.find({}).sort({ title: 1 }).skip(0).limit(20).exec(function (err, imgs) {
+		  	if(err) return res.send("Error! Request failed due to to some unknown error.")
+			res.render("index", {host: req.protocol+'://'+req.get('host'), section: "library", imgs});
+		});
+	})
+
+	$.get('/last-uploads', function(req, res){
       	Images.find({}).sort({ dated: 1 }).skip(0).limit(20).exec(function (err, imgs) {
 		  	if(err) return res.send("Error! Request failed due to to some unknown error.")
 			res.render("index", {host: req.protocol+'://'+req.get('host'), section: "library", imgs});
 		});
-		
-	})
+	});
+
+	$.get('/last-modifications', function(req, res){
+		Images.find({}).sort({ lastUpdate: 1 }).skip(0).limit(20).exec(function (err, imgs) {
+		  	if(err) return res.send("Error! Request failed due to to some unknown error.")
+			res.render("index", {host: req.protocol+'://'+req.get('host'), section: "library", imgs});
+		});
+	});
 
 	$.get('/upload', function(req, res){
 		res.render("index", {host: req.protocol+'://'+req.get('host'), section: "upload"});
@@ -56,7 +69,8 @@ module.exports = function($){
 		    	alt: raw["alt-text"] || null,
 		    	tags,
 		    	desc: raw.description || null,
-		    	dated: new Date().toLocaleString(),
+		    	dated: new Date(),
+		    	lastUpdate: null,
 		    	link: "/image/"+filename,
 		    	width: null,
 		    	height: null,
@@ -144,7 +158,7 @@ module.exports = function($){
 					    	alt: raw["alt"] || null,
 					    	tags,
 					    	desc: raw["desc"] || null,
-					    	dated: new Date().toLocaleString(),
+					    	lastUpdate: new Date(),
 					    	link: "/image/"+filename,
 					    	width: null,
 					    	height: null,
@@ -185,7 +199,7 @@ module.exports = function($){
 		    	alt: raw["alt"] || null,
 		    	tags,
 		    	desc: raw["desc"] || null,
-		    	dated: new Date().toLocaleString()
+		    	lastUpdate: new Date(),
 		    }
 		    Images.update({_id: raw["_id"]}, { $set: updt }, { }, function(err, doc) {  
 			    if(err) return res.status(500).send(err);
@@ -193,9 +207,8 @@ module.exports = function($){
 			    	return res.json({msg:"File is updated!", data: doc})
 			    }
 			});
-
 		}
-	})
+	});
 
 // =====================================================================
 return $;}

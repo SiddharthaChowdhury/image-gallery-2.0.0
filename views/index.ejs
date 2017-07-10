@@ -46,8 +46,7 @@
 						<% if( imgs.length > 0 ) {%>
 						<div class="edit-prev-del">
 							<a href="#" class="preview" >Preview</a> &nbsp; 
-							<a href="#" class="edit-chosen">Edit</a> &nbsp; 
-							<a href="#" class="preview">Delete</a>
+							<a href="#" class="edit-chosen"><i class="fa fa-cog"></i> Settings</a> &nbsp; 
 						</div>
 						<label><img src="<%= host+imgs[0].link %>" alt="<%= host+imgs[0].alt %>" class="chosen-image" title="<%= imgs[0].title %>"></label>
 						<div class="chosen-meta">
@@ -58,10 +57,10 @@
 									<tr><td>Title: </td><td><b class="chosen-title"><%= imgs[0].title %></b></td></tr>
 									<tr><td>Size: </td><td class="chosen-size"><%= imgs[0].size %>mb</td></tr>
 									<tr><td>Diamention: </td><td class="chosen-diam"><%= imgs[0].width %> x <%= imgs[0].height %></td></tr>
-									<tr><td>Date: </td><td class="chosen-date"><%= imgs[0].dated %></td></tr>
+									<tr><td>Date: </td><td class="chosen-date"><%= imgs[0].dated.toLocaleString() %></td></tr>
 								</table>		
 							</small>
-							<hr>
+							
 						</div>
 						<%}%>
 					</div>
