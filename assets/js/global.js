@@ -235,6 +235,7 @@ $(document).ready(function(){
     });
 
     $('.jq_updateImgMeta').click(function(e){
+        var self = $(this);
         if(lastImgSrc.length > 0){
             // Update with cropped image
             cropper.getCroppedCanvas().toBlob(function (blob) {
@@ -248,27 +249,42 @@ $(document).ready(function(){
                 formData.append('alt',$('#chosen-alt').val())
                 formData.append('desc',$('#chosen-desc').val() || $('#chosen-desc').text())
 
-                // Use `jQuery.ajax` method
                 $.ajax('/update-image', {
                     method: "POST",
                     data: formData,
                     processData: false,
                     contentType: false,
                     success: function () {
-                        console.log('Upload success');
+                        location.reload();
                     },
                     error: function () {
                         console.log('Upload error');
+                        self.closest('.modal-dialog').find("._mike").html('<font color="red">Error! Failed to update the image.</font>')
                     }
                 });
             });
         }else{
             // Update only details
+            var formData = new FormData();
+            formData.append('fileName', $('#chosen-file').val())
             formData.append('_id',$('#chosen-id').val())
             formData.append('title',$('#chosen-title').val())
             formData.append('tags',$('#chosen-tags').val())
             formData.append('alt',$('#chosen-alt').val())
             formData.append('desc',$('#chosen-desc').val() || $('#chosen-desc').text())
+            $.ajax('/update-image', {
+                method: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function () {
+                    location.reload();
+                },
+                error: function () {
+                    console.log('Upload error');
+                    self.closest('.modal-dialog').find("._mike").html('<font color="red">Error! Failed to update the image.</font>')
+                }
+            });
         }
         
     });

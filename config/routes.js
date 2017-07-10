@@ -101,12 +101,8 @@ module.exports = function($){
 
 	// Update Image
 	$.post('/update-image', function(req, res){
-		// if (!req.files){
-		//     res.status(400)
-		//     return res.json({mag: 'No files were uploaded.'});
-		// }
 		var raw = req.body;
-		if(!raw._id){
+		if(!raw._id){ // Update with image 
 			res.status(400);
 			return res.json({msg:"Update failed. (No identity) "})
 		}
@@ -176,6 +172,28 @@ module.exports = function($){
 					});
 				})  
 		    }) 
+		}else{ // Update only meta [no image update]
+			var tags = null;
+		    if( raw.tags ){
+		    	tags = raw["tags"].split(",");
+			    for(var i = 0; i < tags.length; i++){
+			    	tags[i] = tags[i].trim();
+			    }
+		    }
+			var updt = {
+		    	title: raw["title"],
+		    	alt: raw["alt"] || null,
+		    	tags,
+		    	desc: raw["desc"] || null,
+		    	dated: new Date().toLocaleString()
+		    }
+		    Images.update({_id: raw["_id"]}, { $set: updt }, { }, function(err, doc) {  
+			    if(err) return res.status(500).send(err);
+			    else{
+			    	return res.json({msg:"File is updated!", data: doc})
+			    }
+			});
+
 		}
 	})
 
