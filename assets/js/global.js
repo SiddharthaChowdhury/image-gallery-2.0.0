@@ -199,16 +199,22 @@ $(document).ready(function(){
     });
 
     $('.edit-chosen').click(function(e){
-        var image = new Image()
-        image.style = "width:100%;"
-        // $(image).attr("src", $('.chosen-image').attr("src"));
-        image.onload = function() {
-            cropper = new Cropper(this, {
-            });
-        }
-        image.src = $('.chosen-image').attr("src");
-        lastImgSrc = [];
-        $('#cropCanvas').html(image)
+        e.preventDefault()
+        $('#cropCanvas').html("<i class='fa fa-cog fa-spin fa-fw'></i> Please wait ...")
+        $('#editImgModal').modal('show');
+        $("#editImgModal").on("shown.bs.modal", function() {
+            var image = new Image()
+            image.style = "width:100%;"
+            // $(image).attr("src", $('.chosen-image').attr("src"));
+            image.onload = function() {
+                cropper = new Cropper(this, {
+                });
+                $('.si_modalWrapper').show()
+            }
+            image.src = $('.chosen-image').attr("src");
+            lastImgSrc = [];
+            $('#cropCanvas').html(image)
+        })
     })
 
     $('._croppedImage').click(function(e){
