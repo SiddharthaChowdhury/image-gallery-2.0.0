@@ -111,6 +111,8 @@ $(document).ready(function(){
                     $('.chosen-image').attr("src", $("#host").val()+img.link);
                     $('.chosen-image').attr("title", img.title);
                     $('.chosen-image').attr("alt", img.alt);
+                    $('.chosen-url').attr("href", $("#host").val()+img.link);
+                    $('.chosen-url').text($("#host").val()+img.link);
                     // console.log()
                     // $('.bootstrap-tagsinput').find('input').val("")
                     // $('.bootstrap-tagsinput').find('input').val(img.tags != null ? img.tags.join(",") : "")
@@ -198,6 +200,7 @@ $(document).ready(function(){
         cropper.zoom(-0.1)
     });
 
+    // When edit/Settings button is pressed
     $('.edit-chosen').click(function(e){
         e.preventDefault()
         $('#cropCanvas').html("<i class='fa fa-cog fa-spin fa-fw'></i> Please wait ...")
@@ -218,12 +221,10 @@ $(document).ready(function(){
         $('.image-meta-edit').show();
     });
 
+    // When crop button is clicked
     $('._croppedImage').click(function(e){
         e.preventDefault();
         lastImgSrc.push( $('.cropper-hidden').attr("src") )
-        // var canv = cropper.getCroppedCanvas({width: 500});
-        // $('#croppedCanvas').find('.croppedCanvasContainer').html(canv)
-        // $('#croppedCanvas').modal('show');
         var image = new Image()
         image.style = "width:100%;"
         image.onload = function() {
@@ -234,6 +235,7 @@ $(document).ready(function(){
         $('#cropCanvas').html(image)
     });
 
+    // Update image
     $('.jq_updateImgMeta').click(function(e){
         var self = $(this);
         if(lastImgSrc.length > 0){
@@ -286,6 +288,33 @@ $(document).ready(function(){
                 }
             });
         }
-        
     });
+
+    // On image preview button is pressed
+    $('.preview-chosen').click(function(e){
+        e.preventDefault();
+        $("#img-in-viewer").attr("src", $('.chosen-image').attr("src"));
+        $("#viewer-caption").text($('.chosen-image').attr('title'))
+        $("#image-viewer").show();
+    })
+    // // Get the modal
+    //     var modal = document.getElementById('image-viewer');
+
+    //     // Get the image and insert it inside the modal - use its "alt" text as a caption
+    //     var img = document.getElementById('viewable');
+    //     var modalImg = document.getElementById("img-in-viewer");
+    //     var captionText = document.getElementById("viewer-caption");
+    //     img.onclick = function(){
+    //         modal.style.display = "block";
+    //         modalImg.src = this.src;
+    //         captionText.innerHTML = this.alt;
+    //     }
+
+    //     // Get the <span> element that viewer-closes the modal
+    //     var span = document.getElementsByClassName("viewer-close")[0];
+
+    //     // When the user clicks on <span> (x), viewer-close the modal
+    //     span.onclick = function() { 
+    //         modal.style.display = "none";
+    //     }
 });

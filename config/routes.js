@@ -13,7 +13,7 @@ module.exports = function($){
 	$.get('/', function(req, res){
       	Images.find({}).sort({ title: 1 }).skip(0).limit(20).exec(function (err, imgs) {
 		  	if(err) return res.send("Error! Request failed due to to some unknown error.")
-			res.render("index", {host: req.protocol+'://'+req.get('host'), section: "library", imgs});
+			res.render("index", {host: req.protocol+'://'+req.headers.host || req.get('host'), section: "library", imgs});
 		});
 	})
 
@@ -120,28 +120,28 @@ module.exports = function($){
 			res.status(400);
 			return res.json({msg:"Update failed. (No identity) "})
 		}
-		if (req.files){
-			let file = req.files.incoming;
-			let filename;
-			let sizeOf = require('image-size');
-			let fs = require("fs");
+		Images.findOne({_id: raw._id}, function(err, img){
+	    	if(err || !img) {
+	    		res.status(400)
+	    		return res.send(err || "Error! Identity failed.")
+	    	}
+			if (req.files){
+				let file = req.files.incoming;
+				let filename;
+				let sizeOf = require('image-size');
+				let fs = require("fs");
 
-			var extension = file.name.split('.').pop();
-		    // filename = filename+'.'+extension;
-		    
-		    var tags = null;
-		    if( raw.tags ){
-		    	tags = raw["tags"].split(",");
-			    for(var i = 0; i < tags.length; i++){
-			    	tags[i] = tags[i].trim();
+				var extension = file.name.split('.').pop();
+			    // filename = filename+'.'+extension;
+			    
+			    var tags = null;
+			    if( raw.tags ){
+			    	tags = raw["tags"].split(",");
+				    for(var i = 0; i < tags.length; i++){
+				    	tags[i] = tags[i].trim();
+				    }
 			    }
-		    }
-		    Images.findOne({_id: raw._id}, function(err, img){
-		    	if(err || !img) {
-		    		res.status(400)
-		    		return res.send(err || "Error! Identity failed.")
-		    	}
-		    	var filename = img.filename;
+		    	filename = img.filename;
 		    	fs.unlink('./public/'+filename, function(err){
 		    		if(err) {
 		    			res.status(400);
@@ -158,6 +158,7 @@ module.exports = function($){
 					    	alt: raw["alt"] || null,
 					    	tags,
 					    	desc: raw["desc"] || null,
+					    	dated: img.dated,
 					    	lastUpdate: new Date(),
 					    	link: "/image/"+filename,
 					    	width: null,
@@ -185,29 +186,30 @@ module.exports = function($){
 						});
 					});
 				})  
-		    }) 
-		}else{ // Update only meta [no image update]
-			var tags = null;
-		    if( raw.tags ){
-		    	tags = raw["tags"].split(",");
-			    for(var i = 0; i < tags.length; i++){
-			    	tags[i] = tags[i].trim();
+			}else{ // Update only meta [no image update]
+				var tags = null;
+			    if( raw.tags ){
+			    	tags = raw["tags"].split(",");
+				    for(var i = 0; i < tags.length; i++){
+				    	tags[i] = tags[i].trim();
+				    }
 			    }
-		    }
-			var updt = {
-		    	title: raw["title"],
-		    	alt: raw["alt"] || null,
-		    	tags,
-		    	desc: raw["desc"] || null,
-		    	lastUpdate: new Date(),
-		    }
-		    Images.update({_id: raw["_id"]}, { $set: updt }, { }, function(err, doc) {  
-			    if(err) return res.status(500).send(err);
-			    else{
-			    	return res.json({msg:"File is updated!", data: doc})
+				var updt = {
+			    	title: raw["title"],
+			    	alt: raw["alt"] || null,
+			    	tags,
+			    	desc: raw["desc"] || null,
+			    	dated: img.dated,
+			    	lastUpdate: new Date(),
 			    }
-			});
-		}
+			    Images.update({_id: raw["_id"]}, { $set: updt }, { }, function(err, doc) {  
+				    if(err) return res.status(500).send(err);
+				    else{
+				    	return res.json({msg:"File is updated!", data: doc})
+				    }
+				});
+			}
+		}) 
 	});
 
 // =====================================================================

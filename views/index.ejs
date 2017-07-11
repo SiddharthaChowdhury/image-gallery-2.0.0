@@ -1,7 +1,7 @@
 <% include ./partials/head %>
 			<div class="col-md-10 body-content">
 				<% if(section == "library") {%>
-				<div>All Images</div>
+				<div><h3>All Images</h3></div>
 				<div class="row">
 					<% if( imgs.length > 0 ) {%>
 					<div class="col-md-8 image-thumb-cont">
@@ -45,7 +45,7 @@
 						<!-- Right -->
 						<% if( imgs.length > 0 ) {%>
 						<div class="edit-prev-del">
-							<a href="#" class="preview" >Preview</a> &nbsp; 
+							<a href="#" class="preview-chosen" >Preview</a> &nbsp; 
 							<a href="#" class="edit-chosen"><i class="fa fa-cog"></i> Settings</a> &nbsp; 
 						</div>
 						<label><img src="<%= host+imgs[0].link %>" alt="<%= host+imgs[0].alt %>" class="chosen-image" title="<%= imgs[0].title %>"></label>
@@ -57,7 +57,9 @@
 									<tr><td>Title: </td><td><b class="chosen-title"><%= imgs[0].title %></b></td></tr>
 									<tr><td>Size: </td><td class="chosen-size"><%= imgs[0].size %>mb</td></tr>
 									<tr><td>Diamention: </td><td class="chosen-diam"><%= imgs[0].width %> x <%= imgs[0].height %></td></tr>
-									<tr><td>Date: </td><td class="chosen-date"><%= imgs[0].dated.toLocaleString() %></td></tr>
+									<tr><td>Created: </td><td class="chosen-date"><%= imgs[0].dated.toLocaleString() %></td></tr>
+									<tr><td>Updated: </td><td class="chosen-date"><%= imgs[0].lastUpdate ? imgs[0].lastUpdate.toLocaleString() : "never" %></td></tr>
+									<tr><td>URL:</td><td><a class="chosen-url" href="<%= host+imgs[0].link %>" target="_blank"><%= host+imgs[0].link %></a></td></tr>
 								</table>		
 							</small>
 							

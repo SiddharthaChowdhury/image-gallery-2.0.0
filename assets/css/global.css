@@ -54,8 +54,8 @@ body {
     margin-top: 20px;
     /*height: 80vh;*/
     border: 2px solid #f1f1f1;
-    border-left: none;
-    border-right: none;
+    /*border-left: none;*/
+    /*border-right: 2px solid #f1f1f1;*/
     padding: 15px;
     /*overflow-y: scroll;*/
 }
@@ -69,6 +69,7 @@ select.image-thumb-sort{
     overflow-y:auto;
 }
 .img-thumbnail{ cursor: pointer;}
+.img-thumbnail:hover {opacity: 0.7;}
 .chosen-image{
     max-width: 200px;
     max-height: 300px;
@@ -209,4 +210,93 @@ table#image-meta tr td{padding: 0px 5px;}
     overflow-y: auto;
     overflow-x: hidden;
 }
+
 .si_modalWrapper{display: none;}
+
+/*============== IMAGE VIEWER ================*/
+/* Style the Image Used to Trigger the Modal */
+/*#viewable {
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#viewable:hover {opacity: 0.7;}*/
+
+/* The Modal (background) */
+.viewer-modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+}
+
+/* Modal Content (Image) */
+.viewer-content {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+}
+
+/* Caption of Modal Image (Image Text) - Same Width as the Image */
+#viewer-caption {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+    text-align: center;
+    color: #ccc;
+    padding: 10px 0;
+    height: 150px;
+}
+
+/* Add Animation - Zoom in the Modal */
+.viewer-content, #caption { 
+    -webkit-animation-name: zoom;
+    -webkit-animation-duration: 0.6s;
+    animation-name: zoom;
+    animation-duration: 0.6s;
+}
+
+@-webkit-keyframes zoom {
+    from {-webkit-transform:scale(0)} 
+    to {-webkit-transform:scale(1)}
+}
+
+@keyframes zoom {
+    from {transform:scale(0)} 
+    to {transform:scale(1)}
+}
+
+/* The viewer-Close Button */
+.viewer-close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.viewer-close:hover,
+.viewer-close:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* 100% Image Width on Smaller Screens */
+@media only screen and (max-width: 700px){
+    .viewer-content {
+        width: 100%;
+    }
+}
