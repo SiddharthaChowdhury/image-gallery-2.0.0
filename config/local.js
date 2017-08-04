@@ -1,7 +1,7 @@
 var config = {
     local: {
         mode: 'Local',
-        port: 1337
+        port: 1333
     },
     testing: {
         mode: 'Testing',
