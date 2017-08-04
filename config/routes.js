@@ -42,10 +42,10 @@ module.exports = function($){
 		    return res.json({mag: 'No files were uploaded.'});
 		}
 		var raw = req.body;
-		let file = req.files.incoming;
-		let filename = Date.now();
-		let sizeOf = require('image-size');
-		let fs = require("fs");
+		var file = req.files.incoming;
+		var filename = Date.now();
+		var sizeOf = require('image-size');
+		var fs = require("fs");
 
 		var extension = file.name.split('.').pop();
 	    filename = filename+'.'+extension;
@@ -79,7 +79,7 @@ module.exports = function($){
 		    Images.insert(imageData, function(err, doc) {  
 			    if(err) return res.status(500).send(err);
 			    else{
-			    	let dimensions = sizeOf('./public/'+filename);
+			    	var dimensions = sizeOf('./public/'+filename);
 					const stats = fs.statSync('./public/'+filename);
 					const fileSizeInBytes = stats.size;
 					const fileSizeInMegabytes = fileSizeInBytes / 1000000.0;
@@ -126,10 +126,10 @@ module.exports = function($){
 	    		return res.send(err || "Error! Identity failed.")
 	    	}
 			if (req.files){
-				let file = req.files.incoming;
-				let filename;
-				let sizeOf = require('image-size');
-				let fs = require("fs");
+				var file = req.files.incoming;
+				var filename;
+				var sizeOf = require('image-size');
+				var fs = require("fs");
 
 				var extension = file.name.split('.').pop();
 			    // filename = filename+'.'+extension;
@@ -168,7 +168,7 @@ module.exports = function($){
 					    Images.update({_id: raw["_id"]}, imageData, function(err, doc) {  
 						    if(err) return res.status(500).send(err);
 						    else{
-						    	let dimensions = sizeOf('./public/'+filename);
+						    	var dimensions = sizeOf('./public/'+filename);
 								const stats = fs.statSync('./public/'+filename);
 								const fileSizeInBytes = stats.size;
 								const fileSizeInMegabytes = fileSizeInBytes / 1000000.0;
