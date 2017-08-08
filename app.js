@@ -1,6 +1,6 @@
 var express = require('express'),
 	app		= express(),
-	path = require('path'),
+	path 	= require('path'),
 	server	= require('http').createServer(app),
 	stage	= require('./config/local')('local'),
 	fileUpload = require('express-fileupload'),

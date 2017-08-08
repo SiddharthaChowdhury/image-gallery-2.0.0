@@ -230,12 +230,14 @@ $(document).ready(function(){
     // When crop button is clicked
     $('._croppedImage').click(function(e){
         e.preventDefault();
+        $('#editImgModal').find(".si_mike").html("Please wait..")
         lastImgSrc.push( $('.cropper-hidden').attr("src") )
         var image = new Image()
         image.style = "width:100%;"
         image.onload = function() {
             cropper = new Cropper(this, {
             });
+            $('#editImgModal').find(".si_mike").html("")
         }
         image.src = cropper.getCroppedCanvas().toDataURL()
         $('#cropCanvas').html(image)
@@ -255,6 +257,7 @@ $(document).ready(function(){
                 formData.append('title',$('#chosen-title').val())
                 formData.append('tags',$('#chosen-tags').val())
                 formData.append('alt',$('#chosen-alt').val())
+                formData.append('ownerId',$('#owner-id').val())
                 formData.append('desc',$('#chosen-desc').val() || $('#chosen-desc').text())
 
                 $.ajax('/update-image', {

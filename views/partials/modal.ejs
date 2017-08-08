@@ -91,7 +91,9 @@
                         <% if( imgs.length > 0 ) {%>
                         <div class="col-md-5">
                             <div class="image-meta-edit">
+                                <div class="si_mike"></div>
                                 <input type="hidden" id="chosen-file">
+                                <input type="hidden" name="ownerId" id="owner-id" value="<%= usr.user_id %>">
                                 <div class="form-group">
                                     <label for="usr">Tags:</label>
                                     <!-- <input type="text" class="form-control" data-role="tagsinput" id="chosen-tags" value="<%= imgs[0].tags != null ? imgs[0].tags.join(',') : '' %>"> -->
@@ -105,6 +107,7 @@
                                     <label for="usr">Alt text:</label>
                                     <input type="text" class="form-control" id="chosen-alt" value="<%= imgs[0].alt %>">
                                 </div>
+
                                 <div class="form-group">
                                     <label for="comment">Description:</label>
                                     <textarea class="form-control" rows="3" id="chosen-desc"><%= imgs[0].desc %></textarea>

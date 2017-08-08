@@ -1,4 +1,5 @@
 var Datastore = require('nedb');
+var _path = require('path');
 var Images = new Datastore({ filename: './em-data/images.db', autoload: true }); 
 var Users = new Datastore({ filename: './em-data/users.db', autoload: true }); 
 module.exports = function($){
@@ -74,6 +75,21 @@ module.exports = function($){
 		})
 	})	
 
+	// GET image details
+	$.post('/get-image', function(req, res){
+		var raw = req.body;
+		if(!raw.id){
+			res.status(400);
+			return res.json({msg: "Error! image identification was not found!"})
+		}else{
+			Images.findOne({_id: raw.id}, function(err, img){
+				if(err) return res.status(400).send(err);
+				res.status(200);
+				return res.json({msg:"Request was successful!", img});
+			});
+		}
+	})
+
 	// Upload image
 	$.post('/upload-image',function(req, res){
 		if (!req.files){
@@ -112,14 +128,14 @@ module.exports = function($){
 				if(fileType[0] == 'image'){
 					path += '/uploads/'+raw.ownerId+'/images';
 				}
-
-				fs.ensureDir(path, function(err) {
+				var correctPath = _path.normalize(path);
+				fs.ensureDir(correctPath, function(err) {
 					if(err){
 						res.status(400);
 						return res.json({msg: 'Failed to created appropriate directories.'})
 					}
 					// Use the mv() method to place the file somewhere on your server 
-					file.mv(path+'/'+filename, function(err) {
+					file.mv(correctPath+'/'+filename, function(err) {
 					    if (err)  return res.status(500).send(err);
 					    var imageData = {
 					    	filename,
@@ -141,8 +157,8 @@ module.exports = function($){
 					    Images.insert(imageData, function(err, doc) {  
 						    if(err) return res.status(500).send(err);
 						    else{
-						    	var dimensions = sizeOf(path+'/'+filename);
-								const stats = fs.statSync(path+'/'+filename);
+						    	var dimensions = sizeOf(correctPath+'/'+filename);
+								const stats = fs.statSync(correctPath+'/'+filename);
 								const fileSizeInBytes = stats.size;
 								const fileSizeInMegabytes = fileSizeInBytes / 1000000.0;
 
@@ -153,7 +169,7 @@ module.exports = function($){
 								};
 								Images.update({_id: doc._id}, { $set: updt }, { }, function (err, update) {
 									if(err) return res.status(500).send(err);
-									return res.json({msg:"File is uploaded! "+path+"/"+filename, data: doc})
+									return res.json({msg:"File is uploaded! "+correctPath+"/"+filename, data: doc})
 								});
 						    }
 						});
@@ -166,21 +182,6 @@ module.exports = function($){
 		});
 	});
 
-	// GET image details
-	$.post('/get-image', function(req, res){
-		var raw = req.body;
-		if(!raw.id){
-			res.status(400);
-			return res.json({msg: "Error! image identification was not found!"})
-		}else{
-			Images.findOne({_id: raw.id}, function(err, img){
-				if(err) return res.status(400).send(err);
-				res.status(200);
-				return res.json({msg:"Request was successful!", img});
-			});
-		}
-	})
-
 	// Update Image
 	$.post('/update-image', function(req, res){
 		var raw = req.body;
@@ -188,7 +189,7 @@ module.exports = function($){
 			res.status(400);
 			return res.json({msg:"Update failed. (No identity) "})
 		}
-		console.log("title:"+ raw["imageName"])
+		// console.log("title:"+ raw["title"])
 		Images.findOne({_id: raw._id}, function(err, img){
 	    	if(err || !img) {
 	    		res.status(400)
@@ -196,6 +197,7 @@ module.exports = function($){
 	    	}
 			if (req.files){
 				var file = req.files.incoming;
+				var fileType = file.mimetype.split('/');
 				var filename;
 				var sizeOf = require('image-size');
 				var fs = require("fs");
@@ -210,35 +212,44 @@ module.exports = function($){
 				    	tags[i] = tags[i].trim();
 				    }
 			    }
+
 		    	filename = img.filename;
-		    	fs.unlink('./public/'+filename, function(err){
+				var path = _root;
+				if(fileType[0] == 'image'){
+					path += '/uploads/'+raw.ownerId+'/images';
+				}
+				var correctPath = _path.normalize(path+'/'+filename);
+				// console.log("path:"+ correctPath)
+		    	fs.unlink(correctPath, function(err){
 		    		if(err) {
 		    			res.status(400);
 		    			return res.send("Error! Image update failed. (replace of image failed)")
 		    		}
 		    		// Use the mv() method to place the file somewhere on your server 
-					file.mv('./public/'+filename, function(err) {
+
+					file.mv(correctPath, function(err) {
 					    if (err)  return res.status(500).send(err);
 					    var imageData = {
 					    	filename,
 					    	filetype: "image",
 					    	extension,
-					    	title: raw["imageName"],
+					    	title: raw["title"],
 					    	alt: raw["alt"] || null,
 					    	tags,
 					    	desc: raw["desc"] || null,
 					    	dated: img.dated,
 					    	lastUpdate: new Date(),
-					    	link: "/image/"+filename,
+					    	// link: "/image/"+filename,
+					    	// link: "/asset/"+raw.ownerId+'/images/'+filename,
 					    	width: null,
 					    	height: null,
 					    	size: null
 					    }
-					    Images.update({_id: raw["_id"]}, imageData, function(err, doc) {  
+					    Images.update({_id: raw._id}, { $set: imageData }, { }, function(err, doc) {  
 						    if(err) return res.status(500).send(err);
 						    else{
-						    	var dimensions = sizeOf('./public/'+filename);
-								const stats = fs.statSync('./public/'+filename);
+						    	var dimensions = sizeOf(correctPath);
+								const stats = fs.statSync(correctPath);
 								const fileSizeInBytes = stats.size;
 								const fileSizeInMegabytes = fileSizeInBytes / 1000000.0;
 
@@ -281,5 +292,23 @@ module.exports = function($){
 		}) 
 	});
 
+	$.post('/get/user-images', function(req, res){
+		if(!req.body.uid){
+			res.status(400);
+			return res.json({msg:"Error! A user-ID and access token is required. "})
+		}
+		var query = { user_id: req.body.uid };
+		if(req.body.fileType){
+			query["filetype"] = req.body.fileType;
+		}
+		if(req.body.gallery)
+			query["gallery"] = req.body.gallery;
+
+		Images.find(query, function(err, imgs){
+			if(err) return res.status(500).send(err)
+			res.status(200);
+		    res.json(imgs)
+		})
+	});
 // =====================================================================
 return $;}
