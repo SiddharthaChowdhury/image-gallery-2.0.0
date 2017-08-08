@@ -39,17 +39,26 @@ module.exports = function($){
 	$.post('/upload-image',function(req, res){
 		if (!req.files){
 		    res.status(400)
-		    return res.json({mag: 'No files were uploaded.'});
+		    return res.json({msg: 'No files were uploaded.'});
 		}
+
 		var raw = req.body;
+		if(!raw.ownerId){
+			res.status(400);
+			return res.json({msg: 'Owner/User identification is missing.'})
+		}
 		var file = req.files.incoming;
+		var fileType = file.mimetype.split('/');
 		var filename = Date.now();
 		var sizeOf = require('image-size');
-		var fs = require("fs");
+		// var fs = require("fs");
+		const fs = require('fs-extra');
 
 		var extension = file.name.split('.').pop();
 	    filename = filename+'.'+extension;
-	    
+	    // console.log(file);
+	    // res.status(400);
+	    // return;
 	    var tags = null;
 	    if( raw.tags ){
 	    	tags = raw["tags"].split(",");
@@ -57,45 +66,56 @@ module.exports = function($){
 		    	tags[i] = tags[i].trim();
 		    }
 	    } 
-		    
-		// Use the mv() method to place the file somewhere on your server 
-		file.mv('./public/'+filename, function(err) {
-		    if (err)  return res.status(500).send(err);
-		    var imageData = {
-		    	filename,
-		    	filetype: "image",
-		    	extension,
-		    	title: raw["image-name"],
-		    	alt: raw["alt-text"] || null,
-		    	tags,
-		    	desc: raw.description || null,
-		    	dated: new Date(),
-		    	lastUpdate: null,
-		    	link: "/image/"+filename,
-		    	width: null,
-		    	height: null,
-		    	size: null
-		    }
-		    Images.insert(imageData, function(err, doc) {  
-			    if(err) return res.status(500).send(err);
-			    else{
-			    	var dimensions = sizeOf('./public/'+filename);
-					const stats = fs.statSync('./public/'+filename);
-					const fileSizeInBytes = stats.size;
-					const fileSizeInMegabytes = fileSizeInBytes / 1000000.0;
+	    var path = _root;
+		if(fileType[0] == 'image'){
+			path += '/uploads/'+raw.ownerId+'/images';
+		}
+		
 
-					var updt = { 
-						width: dimensions.width,
-				    	height: dimensions.height,
-				    	size: fileSizeInMegabytes
-					};
-					Images.update({_id: doc._id}, { $set: updt }, { }, function (err, update) {
-						if(err) return res.status(500).send(err);
-						return res.json({msg:"File is uploaded!", data: doc})
-					});
+		fs.ensureDir(path, function(err) {
+			if(err){
+				res.status(400);
+				return res.json({msg: 'Failed to created appropriate directories.'})
+			}
+			// Use the mv() method to place the file somewhere on your server 
+			file.mv(path+'/'+filename, function(err) {
+			    if (err)  return res.status(500).send(err);
+			    var imageData = {
+			    	filename,
+			    	filetype: "image",
+			    	extension,
+			    	title: raw["imagName"],
+			    	alt: raw["altText"] || null,
+			    	tags,
+			    	desc: raw.description || null,
+			    	dated: new Date(),
+			    	lastUpdate: null,
+			    	link: "/image/"+filename,
+			    	width: null,
+			    	height: null,
+			    	size: null
 			    }
+			    Images.insert(imageData, function(err, doc) {  
+				    if(err) return res.status(500).send(err);
+				    else{
+				    	var dimensions = sizeOf(path+'/'+filename);
+						const stats = fs.statSync(path+'/'+filename);
+						const fileSizeInBytes = stats.size;
+						const fileSizeInMegabytes = fileSizeInBytes / 1000000.0;
+
+						var updt = { 
+							width: dimensions.width,
+					    	height: dimensions.height,
+					    	size: fileSizeInMegabytes
+						};
+						Images.update({_id: doc._id}, { $set: updt }, { }, function (err, update) {
+							if(err) return res.status(500).send(err);
+							return res.json({msg:"File is uploaded! "+path+"/"+filename, data: doc})
+						});
+				    }
+				});
 			});
-		});
+		})
 	});
 
 	// GET image details

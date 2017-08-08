@@ -56,10 +56,12 @@ $(document).ready(function(){
                 mike.html('<font><b>Please wait ... </b></font>')
                 var formdata = new FormData();
                 formdata.append("incoming", file);
-                formdata.append("image-name", _self.find('input[name="image_name"]').val())
-                formdata.append("alt-text", _self.find('input[name="image_caption"]').val())
+                formdata.append("imageName", _self.find('input[name="image_name"]').val())
+                formdata.append("altText", _self.find('input[name="image_caption"]').val())
                 formdata.append("tags", _self.find('input[name="tags"]').val())
                 formdata.append("description", _self.find('textarea[name="description"]').val())
+                formdata.append("ownerId", _self.find('input[name="ownerId"]').val())
+                formdata.append("gallery", _self.find('input[name="gallery"]').val())
                 $.ajax({
                     url: '/upload-image',
                     type: 'POST',
@@ -75,8 +77,10 @@ $(document).ready(function(){
                         }, 1500);
                     },
                     error: function(jqXHR, textStatus, errorThrown){
-                        mike.html('<font color="red"><b>Error! </b>Upload failed.</font>')
-                        location.reload();
+                        setTimeout(function(){ 
+                            mike.html('<font color="red"><b>Error! </b>Upload failed. Please reload and try again.</font>')
+                            location.reload(); 
+                        }, 3000);
                     }
                 });
             }else{

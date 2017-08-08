@@ -6,6 +6,8 @@ var express = require('express'),
 	fileUpload = require('express-fileupload'),
 	routes 	= require('./config/routes')(express.Router());
 
+_root = __dirname;
+
 app.set('views', __dirname+'/views');
 app.set('view engine', 'ejs');
 app.set('x-powered-by', 'Austin4Silvers');
@@ -14,10 +16,12 @@ app.set('x-powered-by', 'Austin4Silvers');
 app.use(fileUpload());
 app.use('/', routes);
 app.use(express.static(path.join(__dirname, 'assets')));
-app.use('/image', express.static(path.join(__dirname, 'public')));
+app.use('/image', express.static(path.join(__dirname, 'uploads')));
 
 server.listen(stage.port, function(){
-	console.log('\n'+'\x1b[33m%s\x1b[0m ', ' ENV: ', "\x1b[36m", stage.mode +"\n","\x1b[31m");
-	console.log( '\x1b[33m%s\x1b[0m: ', '\n Image-Gallery listening on port' ,"\x1b[36m", stage.port);
+	console.log('\n'+'\x1b[33m%s\x1b[0m ', ' App ', "\x1b[36m", 'Image-Gallery',"\x1b[31m");
+	console.log( '\x1b[33m%s\x1b[0m: ', '\n ENV' ,"\x1b[36m", stage.mode.toUpperCase());
+	console.log( '\x1b[33m%s\x1b[0m: ', '\n PORT' ,"\x1b[36m", stage.port);
     console.log("\n","\x1b[31m", "\n Press \'<Ctrl> + c\' to exit \n", "\x1b[35m");
+    console.log("\x1b[0m");
 });
