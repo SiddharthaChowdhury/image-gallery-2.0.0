@@ -37,8 +37,9 @@
                             </div>
                         </div>
                     </div>
-                    <input type="hidden" name="ownerId" id="owner-id" value="10f2k3hg453afs4dd56">
+                    <input type="hidden" name="ownerId" id="owner-id" value="<%= usr.user_id %>">
                     <input type="hidden" name="gallery" id="gallery" value="untitled">
+                    <input type="hidden" name="img_token" id="img_token" value="<%= usr.token %>">
                     <input type="file" name="incoming" id="file-select" style="display:none;">
                     <div class="modal-footer">
                         <small class="pull-left"><span class="prev_size"></span> kb &nbsp; (<span class="prev_diamention"></span>)</small>

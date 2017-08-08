@@ -61,6 +61,7 @@ $(document).ready(function(){
                 formdata.append("tags", _self.find('input[name="tags"]').val())
                 formdata.append("description", _self.find('textarea[name="description"]').val())
                 formdata.append("ownerId", _self.find('input[name="ownerId"]').val())
+                formdata.append("img_token", _self.find('input[name="img_token"]').val())
                 formdata.append("gallery", _self.find('input[name="gallery"]').val())
                 $.ajax({
                     url: '/upload-image',
@@ -71,15 +72,16 @@ $(document).ready(function(){
                     processData: false, // Don't process the files
                     contentType: false, // Set content type to false as jQuery will tell the server its a query string request
                     success: function(data, textStatus, jqXHR){
+                        mike.html('<font color="green"><b>Success! </b>Image saved successfully.</font>')
                         setTimeout(function(){ 
-                            mike.html('<font color="green"><b>Success! </b>Image saved successfully.</font>')
+                            
                             location.reload(); 
                         }, 1500);
                     },
                     error: function(jqXHR, textStatus, errorThrown){
+                         mike.html('<font color="red"><b>Error! </b>Upload failed. Please reload and try again.</font>')
                         setTimeout(function(){ 
-                            mike.html('<font color="red"><b>Error! </b>Upload failed. Please reload and try again.</font>')
-                            location.reload(); 
+                            // location.reload(); 
                         }, 3000);
                     }
                 });

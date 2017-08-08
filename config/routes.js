@@ -1,5 +1,6 @@
 var Datastore = require('nedb');
 var Images = new Datastore({ filename: './em-data/images.db', autoload: true }); 
+var Users = new Datastore({ filename: './em-data/users.db', autoload: true }); 
 module.exports = function($){
 /* =====================================================================
 *						Routes comes here.		
@@ -10,11 +11,22 @@ module.exports = function($){
 *  ---------------------------------------------------------------------
 */
 
-	$.get('/', function(req, res){
-      	Images.find({}).sort({ title: 1 }).skip(0).limit(20).exec(function (err, imgs) {
-		  	if(err) return res.send("Error! Request failed due to to some unknown error.")
-			res.render("index", {host: req.protocol+'://'+req.headers.host || req.get('host'), section: "library", imgs});
-		});
+	$.get('/images/:uid/:token', function(req, res){
+      	Users.findOne({user_id: req.params.uid, token: req.params.token}, function(err, usr){
+      		if(err){
+      			res.status(400);
+				return res.json({err})
+      		}
+      		if(!usr){
+      			res.status(400);
+				return res.json({msg: "Error! User authentication failed."})
+      		}else{
+      			Images.find({user_id: req.params.uid}).sort({ title: 1 }).skip(0).limit(20).exec(function (err, imgs) {
+				  	if(err) return res.send("Error! Request failed due to to some unknown error.")
+					res.render("index", {host: req.protocol+'://'+req.headers.host || req.get('host'), section: "library", imgs, usr});
+				});
+      		}
+      	})
 	})
 
 	$.get('/last-uploads', function(req, res){
@@ -33,6 +45,33 @@ module.exports = function($){
 
 	$.get('/upload', function(req, res){
 		res.render("index", {host: req.protocol+'://'+req.get('host'), section: "upload"});
+	})
+
+	$.post('/register/image-user', function(req, res){
+		if(!req.body.uid){
+			res.status(400);
+			return res.json({msg:"Error! A user-ID is required to register a user."})
+		}
+		Users.findOne({user_id: req.body.uid}, function(err, usr){
+			if(err){
+				res.status(400);
+				return res.json({err})
+			}
+			if(usr){
+				res.status(200);
+				return res.json({usr})
+			}else{
+				var token = "tk_"+Date.now();
+				Users.insert({user_id: req.body.uid, token}, function(err, usr){
+					if(err){
+						res.status(400);
+						return res.json({err})
+					}
+					res.status(200);
+					return res.json({usr})
+				});
+			}
+		})
 	})	
 
 	// Upload image
@@ -47,75 +86,84 @@ module.exports = function($){
 			res.status(400);
 			return res.json({msg: 'Owner/User identification is missing.'})
 		}
-		var file = req.files.incoming;
-		var fileType = file.mimetype.split('/');
-		var filename = Date.now();
-		var sizeOf = require('image-size');
-		// var fs = require("fs");
-		const fs = require('fs-extra');
-
-		var extension = file.name.split('.').pop();
-	    filename = filename+'.'+extension;
-	    // console.log(file);
-	    // res.status(400);
-	    // return;
-	    var tags = null;
-	    if( raw.tags ){
-	    	tags = raw["tags"].split(",");
-		    for(var i = 0; i < tags.length; i++){
-		    	tags[i] = tags[i].trim();
-		    }
-	    } 
-	    var path = _root;
-		if(fileType[0] == 'image'){
-			path += '/uploads/'+raw.ownerId+'/images';
-		}
-		
-
-		fs.ensureDir(path, function(err) {
+		var token = req.body.img_token;
+		Users.findOne({user_id: req.body.ownerId, token}, function(err, usr){
 			if(err){
 				res.status(400);
-				return res.json({msg: 'Failed to created appropriate directories.'})
+				return res.json({err})
 			}
-			// Use the mv() method to place the file somewhere on your server 
-			file.mv(path+'/'+filename, function(err) {
-			    if (err)  return res.status(500).send(err);
-			    var imageData = {
-			    	filename,
-			    	filetype: "image",
-			    	extension,
-			    	title: raw["imagName"],
-			    	alt: raw["altText"] || null,
-			    	tags,
-			    	desc: raw.description || null,
-			    	dated: new Date(),
-			    	lastUpdate: null,
-			    	link: "/image/"+filename,
-			    	width: null,
-			    	height: null,
-			    	size: null
-			    }
-			    Images.insert(imageData, function(err, doc) {  
-				    if(err) return res.status(500).send(err);
-				    else{
-				    	var dimensions = sizeOf(path+'/'+filename);
-						const stats = fs.statSync(path+'/'+filename);
-						const fileSizeInBytes = stats.size;
-						const fileSizeInMegabytes = fileSizeInBytes / 1000000.0;
+			if(usr){
+				var file = req.files.incoming;
+				var fileType = file.mimetype.split('/');
+				var filename = Date.now();
+				var sizeOf = require('image-size');
+				const fs = require('fs-extra');
 
-						var updt = { 
-							width: dimensions.width,
-					    	height: dimensions.height,
-					    	size: fileSizeInMegabytes
-						};
-						Images.update({_id: doc._id}, { $set: updt }, { }, function (err, update) {
-							if(err) return res.status(500).send(err);
-							return res.json({msg:"File is uploaded! "+path+"/"+filename, data: doc})
-						});
+				var extension = file.name.split('.').pop();
+			    filename = filename+'.'+extension;
+			    var tags = null;
+			    if( raw.tags ){
+			    	tags = raw["tags"].split(",");
+				    for(var i = 0; i < tags.length; i++){
+				    	tags[i] = tags[i].trim();
 				    }
-				});
-			});
-		})
+			    } 
+			    var path = _root;
+				if(fileType[0] == 'image'){
+					path += '/uploads/'+raw.ownerId+'/images';
+				}
+
+				fs.ensureDir(path, function(err) {
+					if(err){
+						res.status(400);
+						return res.json({msg: 'Failed to created appropriate directories.'})
+					}
+					// Use the mv() method to place the file somewhere on your server 
+					file.mv(path+'/'+filename, function(err) {
+					    if (err)  return res.status(500).send(err);
+					    var imageData = {
+					    	filename,
+					    	gallery: raw.gallery || 'untitled',
+					    	user_id: raw.ownerId,
+					    	filetype: "image",
+					    	extension,
+					    	title: raw["imageName"],
+					    	alt: raw["altText"] || null,
+					    	tags,
+					    	desc: raw.description || null,
+					    	dated: new Date(),
+					    	lastUpdate: null,
+					    	link: "/asset/"+raw.ownerId+'/images/'+filename,
+					    	width: null,
+					    	height: null,
+					    	size: null
+					    }
+					    Images.insert(imageData, function(err, doc) {  
+						    if(err) return res.status(500).send(err);
+						    else{
+						    	var dimensions = sizeOf(path+'/'+filename);
+								const stats = fs.statSync(path+'/'+filename);
+								const fileSizeInBytes = stats.size;
+								const fileSizeInMegabytes = fileSizeInBytes / 1000000.0;
+
+								var updt = { 
+									width: dimensions.width,
+							    	height: dimensions.height,
+							    	size: fileSizeInMegabytes
+								};
+								Images.update({_id: doc._id}, { $set: updt }, { }, function (err, update) {
+									if(err) return res.status(500).send(err);
+									return res.json({msg:"File is uploaded! "+path+"/"+filename, data: doc})
+								});
+						    }
+						});
+					});
+				})
+			}else{
+				res.status(400);
+				return res.json({msg: "User identification failed."})
+			}
+		});
 	});
 
 	// GET image details
@@ -140,6 +188,7 @@ module.exports = function($){
 			res.status(400);
 			return res.json({msg:"Update failed. (No identity) "})
 		}
+		console.log("title:"+ raw["imageName"])
 		Images.findOne({_id: raw._id}, function(err, img){
 	    	if(err || !img) {
 	    		res.status(400)
@@ -174,7 +223,7 @@ module.exports = function($){
 					    	filename,
 					    	filetype: "image",
 					    	extension,
-					    	title: raw["title"],
+					    	title: raw["imageName"],
 					    	alt: raw["alt"] || null,
 					    	tags,
 					    	desc: raw["desc"] || null,
