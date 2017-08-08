@@ -11,7 +11,7 @@ module.exports = function($){
 *		https://expressjs.com/en/guide/routing.html#express-router
 *  ---------------------------------------------------------------------
 */
-
+	// ============= A P I (All images)
 	$.get('/images/:uid/:token', function(req, res){
       	Users.findOne({user_id: req.params.uid, token: req.params.token}, function(err, usr){
       		if(err){
@@ -48,6 +48,7 @@ module.exports = function($){
 		res.render("index", {host: req.protocol+'://'+req.get('host'), section: "upload"});
 	})
 
+	// ============= A P I (Register image user)
 	$.post('/register/image-user', function(req, res){
 		if(!req.body.uid){
 			res.status(400);
@@ -91,6 +92,7 @@ module.exports = function($){
 	})
 
 	// Upload image
+	// ============= A P I (upload image)
 	$.post('/upload-image',function(req, res){
 		if (!req.files){
 		    res.status(400)
@@ -299,10 +301,10 @@ module.exports = function($){
 		}
 		var query = { user_id: req.body.uid };
 		if(req.body.fileType){
-			query["filetype"] = req.body.fileType;
+			query["filetype"] = req.body.fileType || 'image';
 		}
 		if(req.body.gallery)
-			query["gallery"] = req.body.gallery;
+			query["gallery"] = req.body.gallery || 'untitled';
 
 		Images.find(query, function(err, imgs){
 			if(err) return res.status(500).send(err)
@@ -310,5 +312,23 @@ module.exports = function($){
 		    res.json(imgs)
 		})
 	});
+
+	// ============= A P I (Search image)
+	$.post('/search/asset', function(req, res){
+		if(!req.body.search){
+			res.status(400);
+			return res.json({msg:"Error! Search string is missing."})
+		}
+		var searchStr = req.body.search;
+		var patt = new RegExp(searchStr);
+		Images.find({ $or: [{ tags: searchStr }, { title: patt }] }, function (err, docs) {
+		  	if(err){
+		  		res.status(400);
+				return res.json({err})
+		  	}
+		  	res.status(200);
+		  	return res.json(docs)
+		});
+	})
 // =====================================================================
 return $;}
