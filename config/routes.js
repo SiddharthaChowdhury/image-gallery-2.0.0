@@ -11,6 +11,21 @@ module.exports = function($){
 *		https://expressjs.com/en/guide/routing.html#express-router
 *  ---------------------------------------------------------------------
 */
+	$.get('/', function(req, res){
+		
+		var vew = '';
+		vew += '<h2>Image gallery (prototype)</h2>'
+		vew += '<p>This application specifically targets image asset management. It is user based application, ie. user must create an account to manage (upload, delete, edit) images. </p>';
+		vew += '<p>There are APIs to create users, get images, search images, upload images, etc.</p>';
+		vew += '<p>Following are 2 dummy users for testing purposes:</p>';
+		vew += '<ol><li>"user_id":"175l7568bf298d002d","token":"tk_1502207116078"</li>'
+		vew += '<li>"user_id":"175l7568bf298002d","token":"tk_1502203470214"</li></ol>'
+		vew += '<p><h3>To see how it works - you have to access through either of the users\'s dashboard. Try the one below.</h3></p>'
+		vew += '<p><a href="http://localhost:1333/images/175l7568bf298d002d/tk_1502207116078" target="_blank">Try image-gallery dashboard</a> </p>'
+
+		res.send(vew);
+	})
+
 	// ============= A P I (All images)
 	$.get('/images/:uid/:token', function(req, res){
       	Users.findOne({user_id: req.params.uid, token: req.params.token}, function(err, usr){
